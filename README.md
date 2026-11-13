@@ -40,9 +40,9 @@ The common item inputs are:
 | `c` | Variable cost per unit ordered. |
 | `obs` | Historical demand observation available to the estimation method. |
 
-Simulation input datasets use the equivalent names `lamb`, `rev` and `cost`;
-their result files use `lambda`, `r` and `c`. Group inputs and results use
-`lambda`, `r` and `c` throughout.
+Simulation and grouping inputs and results use `lambda`, `r` and `c`
+throughout. Two-point simulation inputs and results also use the same
+parameter names: `lambda_low`, `lambda_high` and `mixture_probability`.
 
 For each simulation or grouping method, the result columns use these suffixes:
 
@@ -89,8 +89,12 @@ each input dataset. The nine fitted sample sizes are `50`, `100`, `250`,
 nested prefixes of the same run's input dataset.
 
 There are **3,150 result CSVs**, one per scenario, run and sample size. Each
-has exactly `n` rows. The zero-based `item_index` identifies the corresponding
-row of the run's input dataset, and the result's `n` is the fitted sample size.
+has exactly `n` rows. Both input and result files contain `item_index`, the
+zero-based row number in the original 50,000-item input dataset. This index
+is retained across fitted sample sizes and remains valid after sorting.
+Match a result to the input file for the same scenario and run, then join on
+`item_index`; indices repeat between datasets. The result's `n` is the fitted
+sample size.
 
 Examples:
 
@@ -224,9 +228,9 @@ different likelihood-ratio cutoffs and fixed stocking costs.
 
 ### Columns and item identity
 
-The 19 result columns are ordered in these blocks:
+The 20 result columns are ordered in these blocks:
 
-1. Prior and identifiers: `weibull_shape`, `weibull_scale`, `run`, `group`.
+1. Prior and identifiers: `item_id`, `weibull_shape`, `weibull_scale`, `run`, `group`.
 2. Item inputs: `lambda`, `r`, `c`, `obs`.
 3. Oracle: `optimal_conditional_quantity_pre_b`,
    `optimal_conditional_true_conditional_profit_pre_b`.
@@ -245,9 +249,15 @@ conditional profit serves as both the estimated and evaluation profit.
 The filenames encode the two scales, run and group sizes. In the files,
 `group=0` is the larger group and `group=1` the smaller group; the paper uses
 size notation `n_1` for the larger group and `n_0` for the smaller group.
-Each fitted sample uses the required prefix of its group's input dataset.
-Row order is preserved: identify an item by its group and its zero-based
-position within that group in the corresponding input dataset.
+Both input and result files contain `item_id`, the zero-based row number
+in the complete 15,000-item input dataset. Larger-group IDs are `0` through
+`9999`; smaller-group IDs are `10000` through `14999`. Each fitted sample
+uses the required prefix of each group and retains these original IDs.
+For example, a fit with 1,000 larger-group items and 200 smaller-group items
+contains IDs `0` through `999` and `10000` through `10199`. Match a result
+to the input dataset for the same scale pair and run, then join on `item_id`;
+IDs repeat between datasets. Matching does not depend on the current row
+order of either file.
 
 ### Cutoff comparisons
 
