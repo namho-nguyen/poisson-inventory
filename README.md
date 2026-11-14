@@ -9,11 +9,60 @@ information across items to estimate demand distributions and construct
 inventory decisions. The grouping study examines when it is beneficial to
 estimate demand separately for two populations of items.
 
-This repository contains the simulation datasets, anonymous book-sales data
+This repository contains simulation datasets, anonymised book-sales data
 and two-group datasets, together with the saved inventory decisions and
 profit evaluations. The files let readers connect individual decisions to
 the paper's aggregate comparisons and examine how those comparisons vary
 with sample size, demand level, fixed stocking cost and grouping decisions.
+
+## Downloading and extracting the data
+
+Open this repository's **Releases** page and select **v1.0**. Download the
+six named ZIP attachments below, and save the repository's `README.md`
+beside the extracted experiment folders.
+
+| Archive | Paths contained in the archive |
+| --- | --- |
+| `simulation-data.zip` | `simulation/data/` |
+| `simulation-weibull-results.zip` | `simulation/results/weibull/` |
+| `simulation-twopoint-results.zip` | `simulation/results/twopoint/` |
+| `book-data-results.zip` | `book/data/`, `book/results/` |
+| `group-data.zip` | `group/data/` |
+| `group-results.zip` | `group/results/` |
+
+Extract every archive into the **same destination directory**, preserving
+the paths inside each ZIP. Merge matching experiment folders
+if prompted. This reconstructs the following layout:
+
+```text
+README.md
+simulation/
+├── data/
+│   ├── weibull/                      200 input CSVs
+│   ├── twopoint/                     150 input CSVs
+│   └── conditional_distributions/
+│       ├── weibull/                    4 conditional-CDF CSVs
+│       └── twopoint/                   3 conditional-CDF CSVs
+└── results/
+    ├── weibull/                    1,800 result CSVs
+    └── twopoint/                   1,350 result CSVs
+book/
+├── data/
+│   └── book_sales_prices.csv            178 items
+└── results/
+    └── book_decisions_pre_b.csv         534 item-method rows
+group/
+├── data/
+│   ├── datasets/                     540 input CSVs
+│   └── conditional_distributions/     14 conditional-CDF CSVs
+└── results/                        4,860 result CSVs
+```
+
+All data and result files are plain CSVs with header rows; the ZIPs are
+compressed containers for downloading them. The README is a Markdown file.
+Simulation and grouping result CSVs contain one row per item; book results
+contain one row per item and method. Conditional-distribution CSVs contain
+the probability matrices described below.
 
 ## Connection to the paper
 
@@ -21,9 +70,9 @@ Section and table references below follow the accompanying manuscript.
 
 | Experiment | Data and results | Context in the paper |
 | --- | --- | --- |
-| Simulation | [data/simulation](data/simulation), [results/simulation](results/simulation) | Sections 6.1–6.4 compare five estimation methods with a known-prior oracle. Figures 1–2 show performance as the number of items increases; Tables 1–2 examine demand scale and fixed cost. Table S.3 examines the stocking decisions behind the profit differences. |
-| Book sales | [data/book](data/book), [results/book](results/book) | Section 6.5 and Table 3 evaluate inventory decisions using 2022 sales to predict 2023 demand. The supplementary book study compares observation distributions and breaks down stocking decisions and realised profits by 2022 sales group (Table S.6). |
-| Grouping | [data/group](data/group), [results/group](results/group) | Section 7 and Table 4 compare pooling both groups with fitting them separately, selected using a likelihood-ratio test. Table S.7 compares the best splitting cutoffs across group sizes. |
+| Simulation | `simulation/data/`, `simulation/results/` | Sections 6.1–6.4 compare five estimation methods with a known-prior oracle. Figures 1–2 show performance as the number of items increases; Tables 1–2 examine demand scale and fixed cost. Table S.3 examines the stocking decisions behind the profit differences. |
+| Book sales | `book/data/`, `book/results/` | Section 6.5 and Table 3 evaluate inventory decisions using 2022 sales to predict 2023 demand. The supplementary book study compares observation distributions and breaks down stocking decisions and realised profits by 2022 sales group (Table S.6). |
+| Grouping | `group/data/`, `group/results/` | Section 7 and Table 4 compare pooling both groups with fitting them separately, selected using a likelihood-ratio test. Table S.7 compares the best splitting cutoffs across group sizes. |
 
 ## Reading the saved results
 
@@ -88,8 +137,9 @@ each input dataset. The nine fitted sample sizes are `50`, `100`, `250`,
 `500`, `1000`, `5000`, `10000`, `25000` and `50000`. Smaller samples are
 nested prefixes of the same run's input dataset.
 
-There are **3,150 result CSVs**, one per scenario, run and sample size. Each
-has exactly `n` rows. Both input and result files contain `item_index`, the
+There are **350 input CSVs**, one per scenario and run, and **3,150 result
+CSVs**, one per scenario, run and sample size. Each result CSV has exactly
+`n` rows. Both input and result files contain `item_index`, the
 zero-based row number in the original 50,000-item input dataset. This index
 is retained across fitted sample sizes and remains valid after sorting.
 Match a result to the input file for the same scenario and run, then join on
@@ -99,8 +149,8 @@ sample size.
 Examples:
 
 ```text
-results/simulation/weibull/weibull_scale3_run0_n1000.csv
-results/simulation/twopoint/twopoint_low1_high3_p0.5_run0_n1000.csv
+simulation/results/weibull/weibull_scale3_run0_n1000.csv
+simulation/results/twopoint/twopoint_low1_high3_p0.5_run0_n1000.csv
 ```
 
 Weibull results include `weibull_shape` and `weibull_scale`; two-point results
@@ -180,19 +230,22 @@ omitted for Weibull scale `2` and two-point upper rate `3`.
 
 ## Book-sales study
 
-The book study examines inventory decisions for **178 titles**, using 2022
+The book study examines inventory decisions for **178 items**, using 2022
 sales as the historical observation and 2023 sales to evaluate the resulting
-decisions. [book_sales_prices.csv](data/book/book_sales_prices.csv) contains
+decisions. The records use anonymous integer IDs; book titles, ISBNs and
+publisher identifiers are not included.
+
+`book/data/book_sales_prices.csv` contains 178 rows and four columns:
 `item_id`, `sales_2022`, `sales_2023` and `price`. IDs are `0` through `177`.
 
-[book_decisions_pre_b.csv](results/book/book_decisions_pre_b.csv) has 534 rows:
-one per title and method (`gmodel`, `shrinkage`, `single_item`). The same
-`item_id` joins the input data to each method's decision. The result columns
-are `item_id`, `method`, `sales_2022`, `sales_2023`, `price`, `r`, `c`,
-`quantity_pre_b`, `estimated_profit_pre_b` and `realized_profit_pre_b`.
+`book/results/book_decisions_pre_b.csv` contains 534 rows: one per item and
+method (`gmodel`, `shrinkage`, `single_item`). Its ten columns are `item_id`,
+`method`, `sales_2022`, `sales_2023`, `price`, `r`, `c`, `quantity_pre_b`,
+`estimated_profit_pre_b` and `realized_profit_pre_b`. Join on `item_id` to
+match an item's input to its decisions; the IDs remain valid after sorting.
 
-Revenue is `r = 0.2 * price` and variable cost is `c = 0.08 * price`. The
-estimated profit uses 2022 information, while the realised evaluation is
+Revenue is `r = 0.2 * price` and variable cost is `c = 0.08 * price`. Estimated
+profit uses 2022 information, while the realised evaluation is
 
 ```text
 realized_profit_pre_b = r * min(sales_2023, quantity_pre_b)
@@ -201,8 +254,8 @@ realized_profit_pre_b = r * min(sales_2023, quantity_pre_b)
 
 Apply the common fixed-cost rule using `estimated_profit_pre_b` to determine
 stocking and `realized_profit_pre_b` to evaluate the decision. Table 3 reports
-total realised profit across the 178 titles. Table S.6 groups titles by 2022
-sales (`0`, `1–2`, `at least 3`) and reports total titles stocked, units ordered
+total realised profit across the 178 items. Table S.6 groups items by 2022
+sales (`0`, `1–2`, `at least 3`) and reports total items stocked, units ordered
 and realised profits at `b=0,4,5`.
 
 The supplementary histogram compares all 178 book observations with the first
@@ -279,8 +332,8 @@ square root of the number of such rows.
 
 ## True conditional-distribution tables
 
-The files under `data/simulation/conditional_distributions` and
-`data/group/conditional_distributions` contain the true conditional CDFs used
+The files under `simulation/data/conditional_distributions` and
+`group/data/conditional_distributions` contain the true conditional CDFs used
 to evaluate saved decisions and form the oracle benchmark. Entry `(k,s)` is
 `P(future demand <= k | observed demand = s)`: the CSV header gives the
 observation `s`, and data-row positions `k` start at zero.
