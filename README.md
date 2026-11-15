@@ -15,24 +15,16 @@ profit evaluations. The files let readers connect individual decisions to
 the paper's aggregate comparisons and examine how those comparisons vary
 with sample size, demand level, fixed stocking cost and grouping decisions.
 
-## Downloading and extracting the data
+## Downloading the data
 
-Open this repository's **Releases** page and select **v1.0**. Download the
-six named ZIP attachments below, and save the repository's `README.md`
-beside the extracted experiment folders.
+The data and item-level results are stored directly in the `simulation/`,
+`book/` and `group/` folders of this repository.
 
-| Archive | Paths contained in the archive |
-| --- | --- |
-| `simulation-data.zip` | `simulation/data/` |
-| `simulation-weibull-results.zip` | `simulation/results/weibull/` |
-| `simulation-twopoint-results.zip` | `simulation/results/twopoint/` |
-| `book-data-results.zip` | `book/data/`, `book/results/` |
-| `group-data.zip` | `group/data/` |
-| `group-results.zip` | `group/results/` |
+Clone `namho-nguyen/poisson-inventory` using GitHub Desktop or Git to download
+all files and preserve the folder structure. You can also browse the
+experiment folders on GitHub and download individual CSV files.
 
-Extract every archive into the **same destination directory**, preserving
-the paths inside each ZIP. Merge matching experiment folders
-if prompted. This reconstructs the following layout:
+The repository is organised as follows:
 
 ```text
 README.md
@@ -58,8 +50,8 @@ group/
 └── results/                        4,860 result CSVs
 ```
 
-All data and result files are plain CSVs with header rows; the ZIPs are
-compressed containers for downloading them. The README is a Markdown file.
+All data and result files are plain CSVs with header rows. The README is
+a Markdown file.
 Simulation and grouping result CSVs contain one row per item; book results
 contain one row per item and method. Conditional-distribution CSVs contain
 the probability matrices described below.
